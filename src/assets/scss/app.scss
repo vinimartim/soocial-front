@@ -1,6 +1,20 @@
 @import '../../../node_modules/materialize-css/sass/materialize.scss';
 @import '../../../node_modules/material-design-icons/iconfont/material-icons.css';
 
+a {
+  color: #26a69a;
+  cursor: pointer;
+}
+
+.card a {
+  color: #598c87 !important;
+  cursor: pointer;
+}
+
+.mt1 {
+  margin-top: 1em;
+}
+
 .material-icons.md-18 { font-size: 18px }
 .material-icons.md-24 { font-size: 24px }
 .material-icons.md-36 { font-size: 36px }
