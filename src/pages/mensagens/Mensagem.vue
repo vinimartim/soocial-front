@@ -1,13 +1,24 @@
 <template>
   <div class="container">
     <NavbarMensagem />
-    <h4>{{ envio.mensagem.assunto }}</h4>
+    <h4>{{ mensagem.assunto }}</h4>
 
     <router-link v-if="from === 'recebidas'" :to="{ name: 'recebidas' }" key="recebidas">Voltar</router-link>
     <router-link v-else :to="{ name: 'enviadas' }" key="enviadas" value="">Voltar</router-link><br>
-
-    <small>Enviado por: {{ envio.remetente.username }} em {{ formataDataHora(envio.dataHoraEnvio) }}</small>
-    <p>{{ envio.mensagem.conteudo }}</p>
+    <div class="card">
+      <div class="card-content">
+        <small>Enviada por: {{ mensagem.envio.remetente.username }} em {{ formataDataHora(mensagem.envio.dataHoraEnvio) }}</small>
+        <p>{{ mensagem.conteudo }}</p>
+        <img class="responsive-img mt1" v-if="mensagem.anexo" :src="mensagem.anexo.path">
+      </div>
+      <div class="card-action">
+        <a><i class="material-icons tiny">delete</i></a>
+        <a><i class="material-icons tiny">edit</i></a>
+        <a><i class="material-icons tiny">share</i></a>
+        <span class="new badge red" v-show="mensagem.spam === true" data-badge-caption="">SPAM</span>
+        <span class="new badge" v-if="mensagem.edicao == true"  data-badge-caption="">EDITADA</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -20,11 +31,11 @@ export default {
     NavbarMensagem
   },
   data: () => ({
-    envio: '',
+    mensagem: '',
     from: ''
   }),
   created: function () {
-    this.envio = this.$route.params.mensagem.envio
+    this.mensagem = this.$route.params.mensagem
     this.from = this.$route.params.from
   },
   methods: {
@@ -35,3 +46,12 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+
+@media only screen and (min-width: 993px) {
+  .container {
+      width: 50%;
+  }
+}
+</style>

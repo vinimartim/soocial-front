@@ -1,8 +1,8 @@
 <template>
 <div class="container">
-  <NavbarMensagem :envios="this.envios"/>
+  <NavbarMensagem :mensagens="this.mensagens"/>
   <h3>Enviadas</h3>
-  <table class="highlight responsive-table">
+  <table v-if="mensagens.length" class="highlight responsive-table">
     <thead>
       <th>Destinatário</th>
       <th>Mensagem</th>
@@ -11,17 +11,18 @@
       <th></th>
     </thead>
     <tbody>
-      <tr v-for="envio in envios" :key="envio.mensagem.id">
-        <td class="username"><strong>{{ envio.destinatario.nome }}</strong></td>
+      <tr v-for="mensagem in reversedMensagens" :key="mensagem.id">
+        <td class="username"><strong>{{ mensagem.envio.destinatario.username }}</strong></td>
 
-       <td class="text left-align"><a class="link" v-on:click="abrirMensagem(envio)"><strong>{{ envio.mensagem.assunto }}</strong> {{ envio.mensagem.conteudo }}</a></td>
+       <td class="text left-align"><a class="link" v-on:click="abrirMensagem(mensagem)"><strong>{{ mensagem.assunto }}</strong></a></td>
 
-        <td class="right-align"><small> <span v-if="envio.mensagem.spam === true">SPAM | </span> <span v-if="envio.mensagem.edicao === true">EDITADA | </span>  <span v-if="envio.mensagem.visualizada === true">VISUALIZADA</span></small></td>
-        <td class="right-align">{{formataDataHora(envio.dataHoraEnvio)}}</td>
+        <td class="right-align"><small> <span v-if="mensagem.spam === true">SPAM </span> <span v-if="mensagem.edicao === true">EDITADA </span>  <span v-if="mensagem.visualizada === true">VISUALIZADA</span></small></td>
+        <td class="right-align">{{formataDataHora(mensagem.envio.dataHoraEnvio)}}</td>
         <td></td>
       </tr>
     </tbody>
   </table>
+  <span v-else>Você ainda não enviou nenhuma mensagem :(</span>
 </div>
 </template>
 
@@ -35,24 +36,24 @@ export default {
     NavbarMensagem
   },
   data: () => ({
-    envios: []
+    mensagens: []
   }),
   computed: {
-    ...mapState('auth', ['usuario'])
+    ...mapState('auth', ['usuario']),
+    reversedMensagens: function () {
+      return [...this.mensagens].reverse()
+    }
   },
   created: function () {
-    this.$http.get(`envio/mensagens/remetente/${this.usuario.id}`).then(res => {
-      res.data.map(envio => {
-        this.envios.push(envio)
-      })
-      this.envios.reverse()
+    this.$http.get(`mensagem/remetente/${this.usuario.id}`).then(res => {
+      this.mensagens = res.data
     }).catch(err => {
       console.log(err)
     })
   },
   methods: {
-    abrirMensagem (envio) {
-      this.$router.push({ name: 'mensagem', params: { id: envio.mensagem.id, mensagem: { envio }, from: this.$route.name } }).catch(() => { })
+    abrirMensagem (mensagem) {
+      this.$router.push({ name: 'mensagem', params: { id: mensagem.id, mensagem: mensagem, from: this.$route.name } }).catch(() => { })
     },
 
     formataDataHora (data) {
@@ -79,4 +80,5 @@ export default {
 .link {
   cursor: pointer;
 }
+
 </style>

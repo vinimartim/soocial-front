@@ -1,6 +1,7 @@
 <template>
   <div class="container">
     <h3>Cadastro</h3>
+    <span>Já tem cadastro? <a @click="abreLogin()">Faça login</a></span>
     <form @submit.prevent="submit()">
       <div class="input-field">
         <input type="text" placeholder="Nome" v-model="usuario.nome">
@@ -21,7 +22,7 @@
         <input type="text" placeholder="Gênero" v-model="usuario.genero">
       </div>
       <div class="input-field">
-        <input type="text" placeholder="Data nascimento" v-model="usuario.dataNascimento">
+        <input type="date" placeholder="Data nascimento" v-model="usuario.dataNascimento">
       </div>
       <div class="input-field">
         <input type="text" placeholder="Telefone" v-model="usuario.telefone">
@@ -58,7 +59,7 @@ export default {
         email: this.usuario.email,
         senha: this.usuario.senha,
         genero: this.usuario.genero,
-        dataNascimento: this.usuario.dataNascimento,
+        dataNascimento: this.dataFormatada(this.usuario.dataNascimento),
         telefone: this.usuario.telefone
       }
 
@@ -66,8 +67,17 @@ export default {
         this.$router.push({ name: 'login' })
         M.toast({ html: 'Cadastrado com sucesso!' })
       }).catch(err => {
-        M.toast({ html: err.data })
+        console.log(err)
+        M.toast({ html: err.data.mensagem })
       })
+    },
+    abreLogin () {
+      this.$router.push({ name: 'login' }).catch(() => {})
+    },
+    dataFormatada (data) {
+      let dataNascFormatada = data.split('-')
+      dataNascFormatada = `${dataNascFormatada[2]}/${dataNascFormatada[1]}/${dataNascFormatada[0]}`
+      return dataNascFormatada
     }
   },
   mounted () {

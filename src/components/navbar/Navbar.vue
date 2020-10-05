@@ -5,16 +5,16 @@
         <a v-on:click="abreFeed()" class="brand-logo">SOOcial</a>
         <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">menu</i></a>
         <ul class="right hide-on-med-and-down">
-          <li><a v-on:click="abreInbox()">Inbox</a></li>
+          <li><a @click="abreInbox()">Inbox</a></li>
+          <li><a @click="abreGrupos()">Grupos</a></li>
           <li><a href="">Sair, {{ this.usuario.nome }}?</a></li>
         </ul>
       </div>
     </nav>
     <ul class="sidenav" id="mobile-demo">
-      <li><a href="sass.html">Sass</a></li>
-      <li><a href="badges.html">Components</a></li>
-      <li><a href="collapsible.html">Javascript</a></li>
-      <li><a href="mobile.html">Mobile</a></li>
+      <li><a @click="abreInbox()">Inbox</a></li>
+      <li><a @click="abreGrupos()">Grupos</a></li>
+      <li><a href="">Sair, {{ this.usuario.nome }}?</a></li>
     </ul>
   </div>
 </template>
@@ -37,6 +37,9 @@ export default {
     },
     abreFeed () {
       this.$router.push({ name: 'home' }).catch(() => { })
+    },
+    abreGrupos () {
+      this.$router.push({ name: 'grupos' }).catch(() => { })
     }
   }
 }

@@ -5,6 +5,9 @@
 
     <!-- Modal Structure -->
     <div id="modal1" class="modal">
+      <div v-if="loadingMensagem" class="progress">
+          <div class="indeterminate"></div>
+      </div>
       <div class="modal-content">
         <form @submit.prevent="submit()">
           <input type="hidden" v-model="remetente.id">
@@ -17,7 +20,16 @@
           <div class="input-field">
             <textarea class="materialize-textarea" type="text" placeholder="Conteúdo" v-model="conteudo"></textarea>
           </div>
-          <button class="btn waves-effect waves-light" type="submit">Enviar
+          <div class="file-field input-field">
+              <div class="btn-small">
+                <span><i class="material-icons">image</i></span>
+                <input @change="upload" type="file" placeholder="Anexe aqui uma imagem">
+              </div>
+              <div class="file-path-wrapper">
+                <input class="file-path validate" type="text">
+              </div>
+          </div>
+          <button :disabled="botaoAtivo" class="btn waves-effect waves-light" type="submit">Enviar
             <i class="material-icons right">send</i>
           </button>
         </form>
@@ -32,46 +44,75 @@ import { mapState } from 'vuex'
 
 export default {
   name: 'NavbarMensagem',
-  props: ['envios'],
+  props: ['mensagens'],
   data: () => ({
-    remetente: { id: 0 },
-    destinatario: { username: '' },
+    remetente: { id: '' },
+    destinatario: {
+      username: '',
+      id: ''
+    },
     assunto: '',
-    conteudo: ''
+    conteudo: '',
+    record: {
+      file: {}
+    },
+    loadingMensagem: false,
+    botaoAtivo: false
   }),
   computed: {
-    ...mapState('auth', ['usuario'])
+    ...mapState('auth', ['usuario']),
+    reversedMensagens: function () {
+      return [...this.mensagens].reverse()
+    }
   },
   mounted () {
     M.AutoInit()
   },
   methods: {
+    upload (e) {
+      var file = e.target.files
+      this.record.file = file[0]
+    },
     submit () {
-      const dadosMensagem = {
-        remetente: {
-          id: this.usuario.id
-        },
-        destinatario: {
-          username: this.destinatario.username
-        },
-        assunto: this.assunto,
-        conteudo: this.conteudo
-      }
-      this.$http.post('mensagem', dadosMensagem).then(res => {
-        console.log(res.data.id)
+      var elem = document.getElementById('modal1')
+      var instance = M.Modal.getInstance(elem)
 
-        this.$http.get(`envio/mensagem/${res.data.id}`).then(res => {
-          this.envios.unshift(res.data)
+      this.loadingMensagem = true
+      this.botaoAtivo = true
+      this.$http.get(`usuario/username/${this.destinatario.username}`).then(async res => {
+        this.destinatario.id = await res.data.id
+        const data = new FormData()
+        const dadosMensagem = {
+          envio: {
+            destinatario: {
+              id: this.destinatario.id
+            },
+            remetente: {
+              id: this.usuario.id
+            }
+          },
+          assunto: this.assunto,
+          conteudo: this.conteudo
+        }
+        data.append('anexo', this.record.file)
+        data.append('mensagemDTO', JSON.stringify(dadosMensagem))
+        this.$http.post('mensagem', data).then(res => {
+          this.loadingMensagem = false
+          this.botaoAtivo = false
+          if (this.$route.name === 'enviada') {
+            this.mensagens.push(res.data)
+          }
+          M.toast({ html: 'Mensagem enviada!' })
+          instance.close()
         }).catch(err => {
-          M.toast({ html: err.data.mensagem })
+          console.log(err)
+          M.toast({ html: err.body.mensagem })
+          instance.close()
         })
-
-        M.toast({ html: 'Mensagem enviada!' })
-        var elem = document.getElementById('modal1')
-        var instance = M.Modal.getInstance(elem)
-        instance.close()
       }).catch(err => {
-        M.toast({ html: err.data.mensagem })
+        console.log(err)
+        M.toast({ html: err.body.mensagem })
+        instance.close()
       })
     }
   }

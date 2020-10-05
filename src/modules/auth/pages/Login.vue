@@ -2,6 +2,9 @@
   <div class="container">
     <div class="valign-wrapper row login-box">
       <div class="col card hoverable s10 pull-s1 m6 pull-m3 l4 pull-l4">
+        <div v-if="loading" class="progress">
+            <div class="indeterminate"></div>
+        </div>
         <form @submit.prevent="submit()">
           <div class="card-content">
             <span class="card-title">Faça login</span>
@@ -15,8 +18,9 @@
             </div>
           </div>
           <div class="card-action right-align">
-            <button class="btn-flat grey-text waves-effect disabled" type=submit>Registrar</button>
-            <button class="btn waves-effect waves-light" type=submit>Login
+            <a class="btn-flat grey-text waves-effect" @click.prevent="abreCadastro()">Registrar</a>
+            <button class="btn waves-effect waves-light" type=submit>
+              Login
               <i class="material-icons right">send</i>
             </button>
           </div>
@@ -24,27 +28,6 @@
       </div>
     </div>
   </div>
-    <!-- <div class="row valign-wrapper login-box">
-      <div class="col s8 offset-s2">
-        <form @submit.prevent="submit()">
-          <div class="card">
-            <div class="card-content">
-              <span class="card-title">Login</span>
-              <div class="input-field">
-                <input type="text" v-model="form.username" class="form-control" placeholder="Username">
-              </div>
-              <div class="input-field">
-                <input type="password" v-model="form.senha" class="form-control" placeholder="Senha">
-              </div>
-
-              <button class="btn waves-effect waves-light" type=submit>Login
-                <i class="material-icons right">send</i>
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div> -->
 </template>
 
 <script>
@@ -55,17 +38,24 @@ export default {
     form: {
       username: '',
       senha: ''
-    }
+    },
+    loading: false
   }),
   methods: {
     ...mapActions('auth', ['ActionDoLogin']),
     async submit () {
+      this.loading = true
       try {
         await this.ActionDoLogin(this.form)
         this.$router.push({ name: 'home' })
       } catch (err) {
         console.log(err)
+      } finally {
+        this.loading = false
       }
+    },
+    abreCadastro () {
+      this.$router.push({ name: 'signup' }).catch(() => {})
     }
   }
 }

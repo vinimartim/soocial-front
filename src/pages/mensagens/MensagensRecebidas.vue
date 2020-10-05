@@ -1,8 +1,8 @@
 <template>
 <div class="container">
-  <NavbarMensagem :envios="this.envios"/>
+  <NavbarMensagem :mensagens="this.mensagens"/>
   <h3>Inbox</h3>
-  <table class="highlight responsive-table" >
+  <table v-if="mensagens.length" class="highlight responsive-table" >
     <thead>
       <th>Remetente</th>
       <th>Mensagem</th>
@@ -11,18 +11,19 @@
       <th></th>
     </thead>
     <tbody>
-      <tr v-for="(envio, index) in envios" :key="index">
-        <td class="username"><strong>{{ envio.remetente.nome }}</strong></td>
-        <td class="text left-align"><a class="link" v-on:click="abreMensagem(envio)"><strong>{{ envio.mensagem.assunto }}</strong> {{ envio.mensagem.conteudo }}</a></td>
-        <td class="right-align"><small> <span v-if="envio.mensagem.spam === true">SPAM | </span> <span v-if="envio.mensagem.edicao === true">EDITADA | </span>  <span v-if="envio.mensagem.visualizada === true">VISUALIZADA</span></small></td>
-        <td class="right-align">{{formataDataHora(envio.dataHoraEnvio)}}</td>
+      <tr v-for="(mensagem, index) in reversedMensagens" :key="index">
+        <td class="username"><strong>{{ mensagem.envio.remetente.username }}</strong></td>
+        <td class="text left-align"><a class="links" v-on:click="abreMensagem(mensagem)"><strong>{{ mensagem.assunto }}</strong></a></td>
+        <td class="right-align"><small> <span v-if="mensagem.spam === true">SPAM </span> <span v-if="mensagem.edicao === true">EDITADA </span>  <span v-if="mensagem.visualizada === true">VISUALIZADA</span></small></td>
+        <td class="right-align">{{formataDataHora(mensagem.envio.dataHoraEnvio)}}</td>
         <td>
-          <a class="link" @click="editar()"><i class="material-icons">edit</i></a>
-          <a class="link" @click="remover(envio.mensagem.id, index)"><i class="material-icons">delete</i></a>
+          <a class="links" @click="naoImpl()"><i class="material-icons tiny">edit</i></a>
+          <a class="links" @click="naoImpl()"><i class="material-icons tiny">delete</i></a>
         </td>
       </tr>
     </tbody>
   </table>
+  <span v-else>Você ainda não recebeu nenhuma mensagem :(</span>
 </div>
 </template>
 
@@ -37,36 +38,38 @@ export default {
     NavbarMensagem
   },
   data: () => ({
-    envios: []
+    mensagens: []
   }),
   mounted () {
     M.AutoInit()
   },
   computed: {
-    ...mapState('auth', ['usuario'])
+    ...mapState('auth', ['usuario']),
+    reversedMensagens: function () {
+      return [...this.mensagens].reverse()
+    }
   },
   created: function () {
-    this.$http.get(`envio/mensagens/destinatario/${this.usuario.id}`).then(res => {
-      res.data.map(envio => {
-        this.envios.push(envio)
-      })
-      this.envios.reverse()
+    console.log(this.usuario.username)
+    this.$http.get(`mensagem/destinatario/${this.usuario.id}`).then(res => {
+      console.log(res.data)
+      this.mensagens = res.data
     }).catch(err => {
       console.log(err)
     })
   },
   methods: {
-    abreMensagem (envio) {
-      if (envio.mensagem.visualizada === false) {
-        envio.mensagem.visualizada = true
+    abreMensagem (mensagem) {
+      if (mensagem.visualizada === false) {
+        mensagem.visualizada = true
         M.toast({ html: 'Mensagem visualizada!' })
 
-        this.$http.put(`mensagem/${envio.mensagem.id}`, envio.mensagem).catch(err => {
+        this.$http.put(`mensagem/${mensagem.id}`, mensagem).catch(err => {
           console.log(err)
         })
       }
 
-      this.$router.push({ name: 'mensagem', params: { id: envio.mensagem.id, mensagem: { envio }, from: this.$route.name } }).catch(() => { })
+      this.$router.push({ name: 'mensagem', params: { id: mensagem.id, mensagem: mensagem, from: this.$route.name } }).catch(() => { })
     },
 
     formataDataHora (data) {
@@ -74,18 +77,8 @@ export default {
       return `${dataFormatada.getUTCDate()}/${dataFormatada.getUTCMonth()}/${dataFormatada.getUTCFullYear()} às ${dataFormatada.getUTCHours()}:${String(dataFormatada.getUTCMinutes()).padStart(2, '0')}`
     },
 
-    editar () {
-      alert('TODO')
-    },
-
-    remover (id, index) {
-      console.log(id, index)
-      this.$http.delete(`mensagem/${id}`).then(res => {
-        this.envios.splice(index, 1)
-        M.toast({ html: 'Mensagem removida!' })
-      }).catch(err => {
-        M.toast({ html: err.data.mensagem })
-      })
+    naoImpl () {
+      M.toast({ html: 'Isso ainda não foi implementado :(' })
     }
   }
 }
@@ -104,7 +97,8 @@ export default {
   max-width: 100px;
 }
 
-.link {
+.links {
+  color: #26a69a;
   cursor: pointer;
 }
 </style>
