@@ -138,7 +138,7 @@ export default {
       return `${dataFormatada.getUTCDate()}/${dataFormatada.getUTCMonth()}/${dataFormatada.getUTCFullYear()} às ${dataFormatada.getUTCHours()}:${String(dataFormatada.getUTCMinutes()).padStart(2, '0')}`
     },
     abrirMembros () {
-      this.$http.get(`grupo/membros/${this.grupo.id}`).then(res => {
+      this.$http.get(`usuario/grupo/membros/${this.grupo.id}`).then(res => {
         this.membros = res.data
         this.$router.push({ name: 'listaMembros', params: { membros: this.membros, grupo: this.grupo } }).catch(() => {})
       }).catch(err => {

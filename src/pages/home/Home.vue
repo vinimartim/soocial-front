@@ -66,9 +66,7 @@ export default {
   methods: {
     upload (e) {
       var file = e.target.files
-      console.log(e.target.files)
       this.record.file = file[0]
-      console.log(this.record.file)
     },
     submit () {
       var elem = document.getElementById('modal1')
@@ -79,6 +77,7 @@ export default {
       this.loadingFeed = true
       const data = new FormData()
       const dadosPost = { conteudo: this.conteudo, usuario: { id: this.usuario.id } }
+      console.log(dadosPost)
       data.append('anexo', this.record.file)
       data.append('postDTO', JSON.stringify(dadosPost))
       this.$http.post('post', data).then(res => {
@@ -107,15 +106,17 @@ export default {
   },
   mounted () {
     M.AutoInit()
+    this.seguindo.push(this.usuario.id)
     this.$http.get(`seguidores/${this.usuario.id}`).then(res => {
-      res.data.map(seguidor => {
-        this.seguindo.push(seguidor.estaSeguindo)
-        this.$http.get(`post/usuario/${seguidor.estaSeguindo.id}`).then(res => {
-          console.log(res.data)
-          this.posts = res.data
-        }).catch(err => {
-          console.log(err.data)
-        })
+      res.data.map(async seguidor => {
+        this.seguindo = await seguidor.estaSeguindo.id
+        console.log(this.seguindo)
+      })
+      this.$http.get(`post/usuario/${this.seguindo}`).then(res => {
+        console.log(res.data)
+        this.posts = res.data
+      }).catch(err => {
+        console.log(err)
       })
     })
   }

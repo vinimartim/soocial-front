@@ -32,7 +32,7 @@ export default {
   created: function () {
     this.membros = this.$route.params.membros
     this.grupo = this.$route.params.grupo
-    this.$http.get(`grupo/admins/${this.grupo.id}`).then(res => {
+    this.$http.get(`usuario/grupo/admins/${this.grupo.id}`).then(res => {
       this.admins = res.data
     })
   },

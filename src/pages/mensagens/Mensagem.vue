@@ -14,7 +14,6 @@
       <div class="card-action">
         <a><i class="material-icons tiny">delete</i></a>
         <a><i class="material-icons tiny">edit</i></a>
-        <a><i class="material-icons tiny">share</i></a>
         <span class="new badge red" v-show="mensagem.spam === true" data-badge-caption="">SPAM</span>
         <span class="new badge" v-if="mensagem.edicao == true"  data-badge-caption="">EDITADA</span>
       </div>
