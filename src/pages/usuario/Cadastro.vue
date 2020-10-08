@@ -48,7 +48,8 @@ export default {
       genero: '',
       dataNascimento: '',
       telefone: ''
-    }
+    },
+    camposErro: []
   }),
   methods: {
     submit () {
@@ -68,7 +69,9 @@ export default {
         M.toast({ html: 'Cadastrado com sucesso!' })
       }).catch(err => {
         console.log(err)
-        M.toast({ html: err.data.mensagem })
+        err.body.campos.map(campo => {
+          M.toast({ html: `O campo ${campo.nome} ${campo.mensagem}` })
+        })
       })
     },
     abreLogin () {

@@ -109,8 +109,7 @@ export default {
     this.seguindo.push(this.usuario.id)
     this.$http.get(`seguidores/${this.usuario.id}`).then(res => {
       res.data.map(async seguidor => {
-        this.seguindo = await seguidor.estaSeguindo.id
-        console.log(this.seguindo)
+        this.seguindo.push(seguidor.estaSeguindo.id)
       })
       this.$http.get(`post/usuario/${this.seguindo}`).then(res => {
         console.log(res.data)

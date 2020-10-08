@@ -128,6 +128,15 @@ export default {
         instance.close()
       }).catch(err => {
         console.log(err)
+        this.botaoAtivo = false
+        this.loadingGrupo = false
+        if (err.body.campos) {
+          err.body.campos.map(campo => {
+            M.toast({ html: `O campo ${campo.nome} ${campo.mensagem}` })
+          })
+        } else {
+          M.toast({ html: err.body.mensagem })
+        }
       })
     }
   }

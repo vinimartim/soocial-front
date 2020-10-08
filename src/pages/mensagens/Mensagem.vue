@@ -16,6 +16,7 @@
         <a><i class="material-icons tiny">edit</i></a>
         <span class="new badge red" v-show="mensagem.spam === true" data-badge-caption="">SPAM</span>
         <span class="new badge" v-if="mensagem.edicao == true"  data-badge-caption="">EDITADA</span>
+        <span class="new badge" v-if="mensagem.visualizada === true" data-badge-caption="">VIZUALIZADA</span>
       </div>
     </div>
   </div>

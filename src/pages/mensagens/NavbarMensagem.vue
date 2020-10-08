@@ -111,6 +111,8 @@ export default {
         })
       }).catch(err => {
         console.log(err)
+        this.botaoAtivo = false
+        this.loadingMensagem = false
         M.toast({ html: err.body.mensagem })
         instance.close()
       })

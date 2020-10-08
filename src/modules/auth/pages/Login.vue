@@ -32,6 +32,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import M from 'materialize-css'
 
 export default {
   data: () => ({
@@ -49,7 +50,7 @@ export default {
         await this.ActionDoLogin(this.form)
         this.$router.push({ name: 'home' })
       } catch (err) {
-        console.log(err)
+        M.toast({ html: err.body.mensagem })
       } finally {
         this.loading = false
       }
@@ -57,6 +58,9 @@ export default {
     abreCadastro () {
       this.$router.push({ name: 'signup' }).catch(() => {})
     }
+  },
+  mounted () {
+    M.AutoInit()
   }
 }
 </script>
